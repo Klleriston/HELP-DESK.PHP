@@ -21,4 +21,9 @@ class Ticket extends Model
     protected $casts = [
         'posted' => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

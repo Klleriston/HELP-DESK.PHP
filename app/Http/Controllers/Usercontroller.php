@@ -23,7 +23,7 @@ class Usercontroller extends Controller
     public function getUserById(Request $request)
     {
         try {
-            $user = User::where("id", $request->id)->first();
+            $user = User::findOrFail($request->id);
             return response()->json($user);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'User not found'], 404);
@@ -37,11 +37,7 @@ class Usercontroller extends Controller
             "email" => "required|string|email|max:255|unique:users",
             "password" => "required|string|min:4",
         ]);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
+        $user = User::create($validatedData);
 
         return response()->json(['message' => 'Sucess !', 'user' => $user], 201);
 
@@ -50,11 +46,11 @@ class Usercontroller extends Controller
     public function updateUser(Request $request)
     {
         try {
-            $user = User::where('id', $request->id)->first();
+            $user = User::findOrFail($request->id);
 
             $validatedData = $request->validate([
                 "name" => "required|string|max:255",
-                "email" => "required|string|email|max:255|unique:users" . $user->id,
+                "email" => "required|string|email|max:255|unique:users,email," . $user->id,
                 "password" => "required|string|min:4",
             ]);
 
@@ -69,7 +65,7 @@ class Usercontroller extends Controller
     public function deleteUser(Request $request)
     {
         try {
-            $user = User::where('id', $request->id)->first();
+            $user = User::findOrFail($request->id);
 
             $user->delete();
 
